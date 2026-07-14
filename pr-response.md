@@ -60,7 +60,7 @@ a new `WatchlistEntry` model, service functions (`add_to_watchlist`,
   behavior. See Comment 5 for full reasoning.
 
 ### Manual testing steps
-1. Start the app: `python run.py`
+1. Start the app: `python3 app.py`
 2. Add a film to the watchlist:
 ```bash
    curl -X POST http://127.0.0.1:5000/watchlist/<user_id>/add \
