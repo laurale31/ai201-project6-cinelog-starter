@@ -41,3 +41,59 @@ and proposed it as a future optional sort mode rather than dropping it.
 **How I verified:** Ran the full test suite (pytest tests/ -v) after the rebase and after each fix to confirm the changes did not introduce regressions. All tests passed successfully (5/5).
 
 ![git log screenshot](git-log-screenshot.png)
+
+## PR Description
+
+### What this feature does
+Adds a watchlist feature so users can save films they want to watch. Includes 
+a new `WatchlistEntry` model, service functions (`add_to_watchlist`, 
+`get_watchlist`), and REST endpoints (`GET /watchlist/<user_id>`, 
+`POST /watchlist/<user_id>/add`).
+
+### Design decisions
+- **Default visibility:** Watchlists default to `public=False`. A watchlist 
+  reflects a user's future viewing interests, which can be more personal than 
+  a completed watch history — so users opt in to sharing rather than being 
+  exposed by default. See Comment 4 for full reasoning.
+- **Sort order:** Watchlists are sorted by `date_added` descending (most 
+  recently added first), consistent with `get_collection()`'s existing 
+  behavior. See Comment 5 for full reasoning.
+
+### Manual testing steps
+1. Start the app: `python run.py`
+2. Add a film to the watchlist:
+```bash
+   curl -X POST http://127.0.0.1:5000/watchlist/<user_id>/add \
+     -H "Content-Type: application/json" \
+     -d '{"film_id": "<film_id>"}'
+```
+   Expect `201` and a JSON entry with `"public": false`.
+3. View the watchlist:
+```bash
+   curl http://127.0.0.1:5000/watchlist/<user_id>
+```
+   Expect a JSON array with the added film, newest-added first.
+4. Try adding the same film again — expect `409` with a clear error message 
+   (duplicate prevention).
+5. Try adding a nonexistent `film_id` — expect `404` with a clear error message.
+
+## AI Usage
+
+I used AI assistance throughout this project in a few ways:
+- Orientation: had it walk me through collection_service.py before touching 
+  the watchlist code, to understand the dedup and error-handling pattern.
+- Stress-testing Comment 4: after drafting my visibility argument, I asked 
+  what a reviewer might push back on. It pointed out that I claimed users 
+  could toggle visibility, but the endpoint doesn't currently support that — 
+  I revised my response to acknowledge this as a follow-up limitation instead.
+- Debugging: used it to diagnose two real bugs I hit during manual testing — 
+  a Flask/SQLAlchemy double-app-registration issue caused by running app.py 
+  directly instead of a separate entrypoint script, and a missing 
+  Film-to-WatchlistEntry relationship that broke GET /watchlist.
+- Git mechanics: used it to walk through interactive rebase, conflict 
+  resolution, and recovering from a couple of failed rebase attempts, since 
+  this was my first time doing this.
+
+I did not ask AI to write my Comment 4 or Comment 5 responses directly — 
+those reasoning and positions are my own, though I used AI to pressure-test 
+Comment 4 as described above.
