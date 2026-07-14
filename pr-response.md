@@ -39,3 +39,5 @@ and proposed it as a future optional sort mode rather than dropping it.
 ## Comment 6 — Merge Conflict Resolution
 **What I did:** Resolved the rebase conflict in models.py where Git flagged the missing WatchlistEntry class as a conflict because it did not exist on main. Kept the WatchlistEntry class from my branch and updated the film_id field from db.Integer to db.String(36) to match the project's UUID-based film ID schema. After resolving the model conflict, I searched for and fixed remaining integer-based film ID references in the service docstring, route docstring, and test file to keep the implementation and documentation consistent.
 **How I verified:** Ran the full test suite (pytest tests/ -v) after the rebase and after each fix to confirm the changes did not introduce regressions. All tests passed successfully (5/5).
+
+![alt text](image.png)
