@@ -29,6 +29,9 @@ class User(db.Model):
 class Film(db.Model):
     # Film IDs are UUIDs — refactored from integer in commit:
     # "refactor: migrate film IDs from integer to UUID"
+    collection_entries = db.relationship("CollectionEntry", backref="film", lazy=True)
+    watchlist_entries = db.relationship("WatchlistEntry", backref="film", lazy=True)
+    
     id = db.Column(db.String(36), primary_key=True, default=generate_uuid)
     title = db.Column(db.String(200), nullable=False)
     year = db.Column(db.Integer, nullable=True)
